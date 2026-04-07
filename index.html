@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1f1a">
+<title>Vintage 200A — DAW v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   VARIABLES
+══════════════════════════════════════════════ */
+:root{
+  --dk:#1a1f1a; --md:#2a3028; --lt:#3d4a3a; --hi:#4a5c45;
+  --gb:#7ab648; --amb:#d4a017; --amb2:#f5c842;
+  --crm:#e8dcc0; --chr:#c0c8b8; --chr2:#e8ede4;
+  --bak:#1a0f00; --bak2:#2d1f00;
+  --red:#cc2200; --redg:#ff4422; --vu0:#1a1800;
+  --cur:#00ffcc; /* cursor color */
+  --mrk:#d4a017; /* marker color = amber */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--dk);font-family:'Share Tech Mono',monospace;color:var(--crm);touch-action:manipulation;}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--dk)}
+::-webkit-scrollbar-thumb{background:var(--hi);border-radius:2px}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+#header{background:linear-gradient(to bottom,#2e3d2b,#1e2b1b);border-bottom:3px solid var(--amb);box-shadow:0 4px 20px rgba(212,160,23,.22),inset 0 -2px 4px rgba(0,0,0,.5);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;overflow:hidden;}
+#header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.013) 40px,rgba(255,255,255,.013) 41px);pointer-events:none;}
+.logo-main{font-family:'Orbitron',monospace;font-weight:900;color:var(--amb);text-shadow:0 0 20px rgba(212,160,23,.6),2px 2px 4px rgba(0,0,0,.8);letter-spacing:.15em;}
+.logo-sub{font-family:'Share Tech Mono',monospace;color:var(--chr);letter-spacing:.4em;font-size:.5em;text-transform:uppercase;opacity:.8;}
+
+/* ══════════════════════════════════════════════
+   VU METERS
+══════════════════════════════════════════════ */
+.vu-c{background:var(--vu0);border:2px solid #3a3500;border-radius:4px;position:relative;overflow:hidden;box-shadow:inset 0 2px 6px rgba(0,0,0,.8);}
+.vu-s{position:absolute;inset:0;background:linear-gradient(to right,#1a6600 0%,#2d8a00 40%,#5ab800 60%,#c8a000 75%,#e05000 88%,#cc0000 100%);opacity:.3;}
+.vu-b{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(to right,#00cc44,#88dd00,#ffcc00,#ff4400);transition:width .05s ease-out;box-shadow:0 0 8px rgba(100,255,100,.4);}
+.vu-p{position:absolute;top:0;height:100%;width:2px;background:#fff;opacity:0;transition:left .1s,opacity .5s;}
+.vu-lbl{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--amb);font-family:'Share Tech Mono';z-index:2;text-shadow:0 0 4px rgba(212,160,23,.8);}
+
+/* ══════════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════════ */
+.btn-bak{font-family:'Share Tech Mono',monospace;background:linear-gradient(145deg,var(--bak2),var(--bak));border:1px solid #3d2a00;border-top:1px solid rgba(255,200,100,.2);color:var(--crm);cursor:pointer;border-radius:3px;text-transform:uppercase;letter-spacing:.1em;font-size:11px;padding:6px 10px;box-shadow:0 3px 0 #0a0700,0 4px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,180,50,.15);transition:all .08s;user-select:none;}
+.btn-bak:active,.btn-bak.lit{transform:translateY(2px);box-shadow:0 1px 0 #0a0700,inset 0 1px 4px rgba(0,0,0,.6);}
+.btn-bak.active-btn{background:linear-gradient(145deg,#3d2a00,#2a1d00);color:var(--amb2);border-color:var(--amb);box-shadow:0 1px 0 #0a0700,inset 0 1px 4px rgba(0,0,0,.6),0 0 8px rgba(212,160,23,.3);}
+
+.btn-chr{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;background:linear-gradient(145deg,var(--chr2),var(--chr),#8a9280);border:none;border-radius:3px;color:var(--bak);cursor:pointer;letter-spacing:.1em;padding:5px 8px;box-shadow:0 3px 0 #4a5045,0 4px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.6);transition:all .08s;user-select:none;}
+.btn-chr:active{transform:translateY(2px);box-shadow:0 1px 0 #4a5045,inset 0 1px 4px rgba(0,0,0,.3);}
+
+.btn-grn{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;background:linear-gradient(145deg,#1a4a28,#0a2a14);border:2px solid #0a3a18;border-top:2px solid rgba(100,200,80,.28);color:var(--gb);cursor:pointer;border-radius:4px;letter-spacing:.08em;box-shadow:0 4px 0 #041008,0 6px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(100,200,80,.18);text-shadow:0 0 8px rgba(122,182,72,.55);transition:all .08s;user-select:none;}
+.btn-grn:active{transform:translateY(3px);box-shadow:0 1px 0 #041008,inset 0 1px 4px rgba(0,0,0,.7);}
+
+.btn-stp{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;background:linear-gradient(145deg,#3a1a0a,#1a0a04);border:2px solid #2a1008;border-top:2px solid rgba(200,100,50,.28);color:#ff8855;cursor:pointer;border-radius:4px;letter-spacing:.08em;box-shadow:0 4px 0 #080402,0 6px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(200,100,50,.18);text-shadow:0 0 8px rgba(255,136,85,.45);transition:all .08s;user-select:none;}
+.btn-stp:active{transform:translateY(3px);box-shadow:0 1px 0 #080402,inset 0 1px 4px rgba(0,0,0,.7);}
+
+/* AMBER special for calibrate */
+.btn-amb{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;background:linear-gradient(145deg,#3a2800,#1a1400);border:2px solid #4a3800;border-top:2px solid rgba(245,200,66,.3);color:var(--amb2);cursor:pointer;border-radius:4px;letter-spacing:.06em;box-shadow:0 3px 0 #0a0800,0 5px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(245,200,66,.15);text-shadow:0 0 8px rgba(245,200,66,.6);transition:all .08s;user-select:none;}
+.btn-amb:active{transform:translateY(2px);box-shadow:0 1px 0 #0a0800,inset 0 1px 4px rgba(0,0,0,.7);}
+
+/* ══════════════════════════════════════════════
+   REC BUTTON
+══════════════════════════════════════════════ */
+.btn-rec{background:radial-gradient(circle at 40% 35%,#ff6644,var(--red));border:2px solid #660000;border-radius:50%;color:#fff;cursor:pointer;font-family:'Orbitron',monospace;font-weight:900;font-size:9px;letter-spacing:.05em;box-shadow:0 4px 0 #330000,0 6px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,150,100,.5);transition:all .08s;user-select:none;display:flex;align-items:center;justify-content:center;}
+.btn-rec:active{transform:translateY(3px);box-shadow:0 1px 0 #330000,inset 0 2px 6px rgba(0,0,0,.6);}
+.btn-rec.recording{animation:recpulse .8s ease-in-out infinite;box-shadow:0 4px 0 #330000,0 0 22px rgba(255,68,34,.85),0 0 44px rgba(255,68,34,.4);}
+@keyframes recpulse{0%,100%{background:radial-gradient(circle at 40% 35%,#ff6644,#cc2200)}50%{background:radial-gradient(circle at 40% 35%,#ff9977,#ff4422)}}
+
+/* ══════════════════════════════════════════════
+   MONITOR TOGGLE
+══════════════════════════════════════════════ */
+.mon-tog{position:relative;width:46px;height:22px;background:#1a0a00;border:1px solid #3d2a00;border-radius:2px;cursor:pointer;box-shadow:inset 0 2px 4px rgba(0,0,0,.7);user-select:none;overflow:hidden;}
+.mon-tog::before{content:'OFF';position:absolute;left:4px;top:50%;transform:translateY(-50%);font-size:8px;font-family:'Share Tech Mono';color:#555;letter-spacing:.04em;transition:all .2s;z-index:2;}
+.mon-tog::after{content:'';position:absolute;right:3px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:linear-gradient(145deg,#4a5040,#2a3028);border:1px solid rgba(255,255,255,.1);border-radius:1px;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.5);z-index:1;}
+.mon-tog.on{background:#0a1a00;box-shadow:inset 0 2px 4px rgba(0,0,0,.5),0 0 8px rgba(120,200,80,.4);}
+.mon-tog.on::before{content:'ON';left:auto;right:4px;color:var(--gb);text-shadow:0 0 6px rgba(120,200,80,.8);}
+.mon-tog.on::after{right:auto;left:3px;background:linear-gradient(145deg,#88cc44,var(--gb));box-shadow:0 0 6px rgba(120,200,80,.6);}
+
+/* ══════════════════════════════════════════════
+   MUTE / SOLO
+══════════════════════════════════════════════ */
+.btn-mute{font-family:'Orbitron',monospace;font-weight:700;font-size:8px;padding:4px 6px;border-radius:2px;cursor:pointer;border:1px solid #3a3000;background:linear-gradient(145deg,#2a2000,#1a1400);color:#887730;user-select:none;transition:all .08s;letter-spacing:.05em;}
+.btn-mute.on{background:linear-gradient(145deg,#6a5500,#4a3a00);color:var(--amb2);border-color:var(--amb);box-shadow:0 0 8px rgba(212,160,23,.45);}
+.btn-solo{font-family:'Orbitron',monospace;font-weight:700;font-size:8px;padding:4px 6px;border-radius:2px;cursor:pointer;border:1px solid #003a3a;background:linear-gradient(145deg,#002020,#001414);color:#307878;user-select:none;transition:all .08s;letter-spacing:.05em;}
+.btn-solo.on{background:linear-gradient(145deg,#005555,#003a3a);color:#00ffff;border-color:#00aaaa;box-shadow:0 0 8px rgba(0,200,200,.45);}
+
+/* ══════════════════════════════════════════════
+   LED
+══════════════════════════════════════════════ */
+.led{width:10px;height:10px;border-radius:50%;background:#1a0a00;border:1px solid #3d2a00;box-shadow:inset 0 1px 2px rgba(0,0,0,.8);transition:all .1s;flex-shrink:0;}
+.led.grn{background:var(--gb);box-shadow:0 0 8px rgba(122,182,72,.8),inset 0 1px 0 rgba(255,255,255,.4);}
+.led.red{background:var(--redg);box-shadow:0 0 8px rgba(255,68,34,.8),inset 0 1px 0 rgba(255,255,255,.4);animation:blink .5s infinite;}
+.led.amb{background:var(--amb2);box-shadow:0 0 8px rgba(245,200,66,.8),inset 0 1px 0 rgba(255,255,255,.4);}
+.led.cyn{background:#00ffcc;box-shadow:0 0 8px rgba(0,255,200,.8),inset 0 1px 0 rgba(255,255,255,.4);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ══════════════════════════════════════════════
+   CHANNEL STRIP
+══════════════════════════════════════════════ */
+.ch-strip{padding:5px 8px;display:flex;align-items:center;gap:6px;background:linear-gradient(to bottom,rgba(74,92,69,.13),transparent,rgba(0,0,0,.2)),linear-gradient(to right,var(--md),var(--lt),var(--md));border:1px solid rgba(192,200,184,.15);border-top:1px solid rgba(192,200,184,.24);border-radius:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 8px rgba(0,0,0,.4);flex:1;position:relative;min-height:72px;transition:border-left .2s;}
+.ch-strip.has-audio{border-left:3px solid var(--amb);}
+.ch-strip.recording{border-left:3px solid var(--red);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 8px rgba(0,0,0,.4),-2px 0 15px rgba(204,34,0,.4);}
+.ch-strip.muted{opacity:.42;}
+.ch-num{font-family:'VT323',monospace;color:var(--amb);text-shadow:0 0 10px rgba(212,160,23,.6);line-height:1;font-size:28px;}
+.tlab{font-family:'Orbitron',monospace;font-size:8px;font-weight:700;color:var(--chr);letter-spacing:.18em;text-transform:uppercase;opacity:.65;}
+
+/* ══════════════════════════════════════════════
+   WAVEFORM CANVAS WRAPPER — for cursor overlay
+══════════════════════════════════════════════ */
+.wave-wrap{flex:1;min-width:0;position:relative;cursor:crosshair;}
+.wv{background:#060802;border:1px solid #1a2010;border-radius:2px;display:block;width:100%;}
+
+/* Cursor line overlay */
+.wave-cursor{position:absolute;top:0;bottom:18px;width:1.5px;background:var(--cur);opacity:0;pointer-events:none;box-shadow:0 0 6px rgba(0,255,200,.8);z-index:10;transition:opacity .2s;}
+.wave-cursor.visible{opacity:1;}
+
+/* Seek ghost on hover */
+.wave-seek-ghost{position:absolute;top:0;bottom:18px;width:1px;background:rgba(255,255,255,.35);pointer-events:none;z-index:9;opacity:0;}
+
+/* ══════════════════════════════════════════════
+   MARKER FLAGS
+══════════════════════════════════════════════ */
+.marker-flag{position:absolute;top:0;width:2px;background:var(--mrk);box-shadow:0 0 6px rgba(212,160,23,.8);pointer-events:none;z-index:11;}
+.marker-flag::before{content:attr(data-label);position:absolute;top:-1px;left:3px;font-family:'Share Tech Mono';font-size:8px;color:var(--amb2);text-shadow:0 0 4px rgba(0,0,0,.9);white-space:nowrap;pointer-events:none;}
+
+/* ══════════════════════════════════════════════
+   PAN KNOB
+══════════════════════════════════════════════ */
+.pan-knob{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#4a5a45,#1a2018);border:2px solid #2a3828;box-shadow:0 2px 5px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);cursor:pointer;position:relative;touch-action:none;user-select:none;flex-shrink:0;}
+.pan-dot{position:absolute;width:2.5px;height:7px;background:var(--amb);border-radius:2px;left:50%;top:3px;transform:translateX(-50%);transform-origin:50% 10px;}
+
+/* ══════════════════════════════════════════════
+   FADER
+══════════════════════════════════════════════ */
+input[type=range].fader{-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;writing-mode:vertical-lr;direction:rtl;height:52px;width:18px;}
+input[type=range].fader::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:9px;background:linear-gradient(to bottom,var(--chr2),var(--chr));border-radius:2px;border:1px solid #4a5045;box-shadow:0 2px 4px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.5);}
+input[type=range].fader::-webkit-slider-runnable-track{background:#1a2015;border:1px solid #0a1008;width:5px;border-radius:2px;}
+
+/* LATENCY slider */
+input[type=range].lat-sl{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:#0a0f08;border:1px solid #1a2010;border-radius:3px;outline:none;}
+input[type=range].lat-sl::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:linear-gradient(145deg,var(--chr2),var(--chr));border-radius:50%;border:1px solid #4a5045;box-shadow:0 1px 4px rgba(0,0,0,.7);}
+
+/* ══════════════════════════════════════════════
+   MASTER PANEL
+══════════════════════════════════════════════ */
+#master{background:linear-gradient(to bottom,rgba(212,160,23,.05),transparent),linear-gradient(to right,#1e2b1b,#252f22);border-right:3px solid var(--amb);box-shadow:2px 0 15px rgba(212,160,23,.1);width:clamp(115px,17vw,148px);flex-shrink:0;display:flex;flex-direction:column;gap:5px;padding:7px;overflow-y:auto;}
+
+/* ══════════════════════════════════════════════
+   BEAT LEDS
+══════════════════════════════════════════════ */
+.beat-led{width:11px;height:11px;border-radius:3px;background:#1a1200;border:1px solid #3a3000;transition:all .08s;flex-shrink:0;}
+.beat-led.hit{background:var(--amb2);box-shadow:0 0 10px rgba(245,200,66,.9);}
+.beat-led.hit1{background:#fff;box-shadow:0 0 12px rgba(255,255,255,.9);}
+
+/* ══════════════════════════════════════════════
+   BPM INPUT
+══════════════════════════════════════════════ */
+.bpm-in{background:#0a0f08;border:1px solid #2a3a20;color:var(--amb2);font-family:'VT323',monospace;font-size:22px;width:52px;text-align:center;border-radius:3px;box-shadow:inset 0 2px 4px rgba(0,0,0,.7);outline:none;padding:1px 2px;}
+.bpm-in:focus{border-color:var(--gb);}
+
+/* ══════════════════════════════════════════════
+   TAPE REELS
+══════════════════════════════════════════════ */
+.reel{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at center,#1a1a12 30%,transparent 30%),conic-gradient(from 0deg,#2a2a1a,#4a4a30,#2a2a1a,#4a4a30,#2a2a1a,#4a4a30,#2a2a1a,#4a4a30);border:3px solid #3a3a28;box-shadow:0 0 10px rgba(0,0,0,.8);position:relative;flex-shrink:0;}
+.reel::after{content:'';position:absolute;inset:30%;border-radius:50%;background:radial-gradient(circle at 40% 40%,#3a3a28,#1a1a12);border:1px solid #4a4a35;}
+.reel.spin{animation:spin 1.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══════════════════════════════════════════════
+   SCREW
+══════════════════════════════════════════════ */
+.screw{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--chr2),#6a7565);border:1px solid #3a4035;box-shadow:0 2px 3px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.5);flex-shrink:0;position:relative;}
+.screw::after{content:'';position:absolute;top:50%;left:20%;right:20%;height:1.5px;background:rgba(0,0,0,.5);transform:translateY(-50%) rotate(45deg);}
+
+/* ══════════════════════════════════════════════
+   STATUS / TIME
+══════════════════════════════════════════════ */
+.stat-txt{font-family:'VT323',monospace;font-size:14px;color:var(--gb);text-shadow:0 0 8px rgba(122,182,72,.6);letter-spacing:.1em;}
+.time-big{font-family:'VT323',monospace;font-size:24px;color:var(--amb2);text-shadow:0 0 12px rgba(245,200,66,.6);letter-spacing:.08em;line-height:1;}
+
+/* ══════════════════════════════════════════════
+   INIT OVERLAY
+══════════════════════════════════════════════ */
+#overlay{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(42,74,24,.12),transparent 70%),rgba(10,15,10,.97);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;backdrop-filter:blur(3px);}
+.init-btn{font-family:'Orbitron',monospace;font-weight:700;background:radial-gradient(ellipse at 50% 30%,#4a7a30,#2a4a18);border:3px solid #1a3a0a;border-top:3px solid rgba(150,220,80,.35);color:var(--gb);cursor:pointer;border-radius:8px;text-transform:uppercase;letter-spacing:.18em;box-shadow:0 8px 0 #0a1a04,0 12px 24px rgba(0,0,0,.7),inset 0 2px 0 rgba(150,220,80,.28);transition:all .1s;text-shadow:0 0 14px rgba(122,182,72,.75);user-select:none;font-size:clamp(10px,2.2vw,13px);padding:16px 32px;}
+.init-btn:active{transform:translateY(5px);box-shadow:0 2px 0 #0a1a04,inset 0 2px 8px rgba(0,0,0,.5);}
+.perm-box{background:rgba(0,0,0,.55);border:1px solid rgba(212,160,23,.3);border-radius:6px;padding:12px 16px;max-width:340px;font-size:11px;line-height:1.75;color:var(--chr);display:none;}
+.perm-box b{color:var(--amb);}
+.perm-box code{color:var(--gb);font-size:10px;}
+
+/* ══════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════ */
+#toast{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(26,31,26,.95);border:1px solid var(--gb);color:var(--gb);font-family:'Share Tech Mono';font-size:11px;padding:6px 14px;border-radius:4px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-overflow:ellipsis;overflow:hidden;}
+
+/* ══════════════════════════════════════════════
+   EXPORT OVERLAY
+══════════════════════════════════════════════ */
+#exp-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;align-items:center;justify-content:center;}
+#exp-ov.show{display:flex;}
+.exp-box{background:var(--md);border:2px solid var(--amb);border-radius:8px;padding:24px;text-align:center;font-family:'Orbitron',monospace;color:var(--amb);}
+
+/* ══════════════════════════════════════════════
+   CALIBRATION OVERLAY
+══════════════════════════════════════════════ */
+#cal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;align-items:center;justify-content:center;}
+#cal-ov.show{display:flex;}
+.cal-box{background:var(--md);border:2px solid var(--amb2);border-radius:10px;padding:22px;text-align:center;font-family:'Share Tech Mono';color:var(--crm);max-width:320px;width:90vw;}
+.cal-box h3{font-family:'Orbitron',monospace;color:var(--amb2);font-size:13px;letter-spacing:.15em;margin-bottom:12px;}
+
+/* ══════════════════════════════════════════════
+   MARKER CONTEXT MENU
+══════════════════════════════════════════════ */
+#mrk-menu{display:none;position:fixed;background:var(--md);border:1px solid var(--amb);border-radius:4px;padding:4px;z-index:700;min-width:120px;}
+#mrk-menu.show{display:block;}
+#mrk-menu button{display:block;width:100%;background:none;border:none;color:var(--crm);font-family:'Share Tech Mono';font-size:11px;padding:6px 10px;text-align:left;cursor:pointer;border-radius:3px;}
+#mrk-menu button:hover{background:rgba(212,160,23,.2);}
+
+/* ══════════════════════════════════════════════
+   LANDSCAPE HINT
+══════════════════════════════════════════════ */
+#land{display:none;position:fixed;inset:0;background:rgba(10,15,10,.97);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+@media(orientation:portrait) and (max-width:768px){#land{display:flex!important}}
+
+/* ══════════════════════════════════════════════
+   LATENCY INDICATOR
+══════════════════════════════════════════════ */
+.lat-badge{font-family:'VT323',monospace;font-size:14px;color:var(--amb2);text-shadow:0 0 6px rgba(245,200,66,.5);letter-spacing:.06em;}
+
+/* FILE IMPORT DROP ZONE */
+.drop-zone{border:1px dashed rgba(212,160,23,.4);border-radius:3px;padding:3px 5px;font-size:8px;color:var(--chr);opacity:.6;text-align:center;cursor:pointer;}
+.drop-zone:hover{opacity:1;border-color:var(--amb);}
+
+</style>
+</head>
+<body>
+
+<!-- LANDSCAPE HINT -->
+<div id="land">
+  <div style="font-size:44px;">📱↔️</div>
+  <div style="font-family:'Orbitron',monospace;color:var(--amb);font-size:13px;letter-spacing:.18em;text-align:center;">GIRAR DISPOSITIVO<br><span style="font-size:10px;color:var(--chr);opacity:.7;">MODO HORIZONTAL REQUERIDO</span></div>
+</div>
+
+<!-- EXPORT OVERLAY -->
+<div id="exp-ov">
+  <div class="exp-box">
+    <div style="font-size:11px;letter-spacing:.1em;margin-bottom:10px;">RENDERIZANDO MIX</div>
+    <div style="font-size:28px;" id="exp-pct">0%</div>
+    <div style="font-size:9px;color:var(--chr);margin-top:8px;">OfflineAudioContext · 48kHz · 16-bit WAV</div>
+  </div>
+</div>
+
+<!-- CALIBRATION OVERLAY -->
+<div id="cal-ov">
+  <div class="cal-box">
+    <h3>⚙ PUNCH-SYNC CALIBRATION</h3>
+    <div style="font-size:10px;line-height:1.7;color:var(--chr);margin-bottom:14px;">
+      1. Activa el metrónomo con un tempo estable<br>
+      2. Presiona <b style="color:var(--amb2);">START CAL REC</b> — graba 4 beats<br>
+      3. La app analiza la diferencia entre el tic generado y el grabado<br>
+      4. El valor de latencia se aplica automáticamente
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
+      <button class="btn-amb" id="calStartBtn" onclick="startCalRec()" style="padding:10px 16px;font-size:10px;">▶ START CAL REC</button>
+      <button class="btn-stp" id="calStopBtn" onclick="stopCalRec()" style="padding:10px 16px;font-size:10px;" disabled>■ STOP</button>
+    </div>
+    <div style="font-family:'VT323',monospace;font-size:18px;color:var(--amb2);margin-bottom:10px;" id="calResult">LISTO PARA CALIBRAR</div>
+    <button class="btn-bak" onclick="document.getElementById('cal-ov').classList.remove('show')" style="width:100%;padding:8px;font-size:10px;">✕ CERRAR</button>
+  </div>
+</div>
+
+<!-- MARKER CONTEXT MENU -->
+<div id="mrk-menu">
+  <button onclick="addMarkerAtCursor()">＋ Agregar marcador</button>
+  <button onclick="clearAllMarkers()">✕ Borrar todos</button>
+  <button onclick="document.getElementById('mrk-menu').classList.remove('show')">— Cancelar</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════════
+     INIT OVERLAY
+══════════════════════════════════════════════ -->
+<div id="overlay">
+  <div style="display:flex;gap:10px;margin-bottom:6px;"><div class="reel"></div><div class="reel"></div></div>
+  <div style="text-align:center;">
+    <div class="logo-main" style="font-size:clamp(14px,3.5vw,22px);">VINTAGE 200A</div>
+    <span class="logo-sub" style="display:block;margin-top:3px;">DAW STUDIO v3</span>
+  </div>
+  <div style="font-family:'Share Tech Mono';color:var(--chr);font-size:9px;letter-spacing:.18em;opacity:.5;">CURSOR · MARKERS · PUNCH-SYNC · MULTI-FORMAT</div>
+  <button class="init-btn" id="initBtn" onclick="initAudio()">▶ INICIALIZAR SISTEMA DE AUDIO</button>
+  <div id="permMsg" style="font-family:'Share Tech Mono';font-size:11px;color:#ff8855;text-align:center;display:none;max-width:320px;line-height:1.65;"></div>
+  <div class="perm-box" id="permSteps">
+    <b>⚠ MICRÓFONO DENEGADO — CHROME ANDROID:</b><br>
+    1. Toca <b>🔒</b> en la barra de dirección<br>
+    2. <b>Permisos del sitio → Micrófono → Permitir</b><br>
+    3. Recarga (↺)<br><br>
+    Si usas <code>file://</code>: ve a<br>
+    <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code><br>
+    y agrega la ruta del archivo.
+  </div>
+  <div style="font-family:'Share Tech Mono';font-size:8px;color:var(--chr);opacity:.3;letter-spacing:.08em;">AMPEX 200A INSPIRED · CHROME ANDROID OPTIMIZED</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════ -->
+<div id="app" style="display:none;height:100%;flex-direction:column;">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="screw"></div>
+      <div>
+        <div class="logo-main" style="font-size:clamp(11px,2.3vw,18px);">VINTAGE 200A</div>
+        <span class="logo-sub" style="display:block;font-size:7px;">DAW STUDIO v3</span>
+      </div>
+      <div style="display:flex;gap:3px;margin-left:5px;align-items:center;">
+        <div class="led grn" id="hPwr"></div>
+        <div class="led" id="hRec"></div>
+        <div class="led" id="hPlay"></div>
+        <div class="led" id="hCur" title="Cursor activo" style="width:8px;height:8px;"></div>
+      </div>
+    </div>
+    <!-- CENTER -->
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="reel" id="reel1"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="time-big" id="timeD">00:00.0</div>
+        <div class="stat-txt" id="statD" style="font-size:12px;">STANDBY</div>
+        <div style="font-family:'VT323',monospace;font-size:11px;color:var(--chr);opacity:.6;" id="seekDisp">SEEK: 0.00s</div>
+      </div>
+      <div class="reel" id="reel2"></div>
+    </div>
+    <!-- RIGHT -->
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div style="text-align:right;">
+        <div class="lat-badge" id="latBadge">LAT: 0ms</div>
+        <div style="font-family:'Share Tech Mono';font-size:7px;color:var(--chr);opacity:.4;" id="sessName">NO SESSION</div>
+        <div style="font-family:'Share Tech Mono';font-size:7px;color:var(--chr);opacity:.35;" id="bpmDisp">120 BPM</div>
+      </div>
+      <div class="screw"></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1;display:flex;overflow:hidden;min-height:0;">
+
+    <!-- ══ MASTER PANEL ══ -->
+    <div id="master">
+      <div style="font-family:'Orbitron',monospace;font-size:8px;font-weight:700;color:var(--amb);letter-spacing:.18em;text-align:center;opacity:.85;">MASTER</div>
+
+      <!-- Master VU -->
+      <div style="background:#0a0f08;border:1px solid #1a2010;border-radius:3px;padding:4px;">
+        <div style="font-size:7px;color:var(--chr);opacity:.5;margin-bottom:2px;">OUT L/R</div>
+        <div class="vu-c" style="height:10px;margin-bottom:2px;"><div class="vu-s"></div><div class="vu-b" id="mvuL"></div><div class="vu-p" id="mpkL"></div><div class="vu-lbl">L</div></div>
+        <div class="vu-c" style="height:10px;"><div class="vu-s"></div><div class="vu-b" id="mvuR"></div><div class="vu-p" id="mpkR"></div><div class="vu-lbl">R</div></div>
+      </div>
+
+      <!-- METRONOME (big, visible) -->
+      <div style="background:#0a0f08;border:2px solid rgba(212,160,23,.3);border-radius:4px;padding:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <div style="font-size:7px;color:var(--amb);opacity:.9;letter-spacing:.08em;font-family:'Orbitron',monospace;font-weight:700;">METRO</div>
+          <div style="display:flex;gap:3px;">
+            <div class="beat-led" id="b1"></div><div class="beat-led" id="b2"></div>
+            <div class="beat-led" id="b3"></div><div class="beat-led" id="b4"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
+          <input class="bpm-in" id="bpmIn" type="number" min="40" max="240" value="120">
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <button class="btn-amb" id="metBtn" onclick="toggleMetro()" style="padding:5px 8px;font-size:9px;min-width:44px;">CLICK</button>
+            <button class="btn-bak" onclick="tapTempo()" style="font-size:8px;padding:3px 6px;">TAP</button>
+          </div>
+        </div>
+        <!-- PUNCH-SYNC CALIBRATE -->
+        <button class="btn-amb" onclick="openCalibration()" style="width:100%;padding:5px;font-size:8px;letter-spacing:.05em;">⚙ PUNCH-SYNC CAL</button>
+      </div>
+
+      <!-- LATENCY COMPENSATION -->
+      <div style="background:#0a0f08;border:1px solid #1a2010;border-radius:3px;padding:5px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:7px;color:var(--chr);opacity:.6;">LAT COMP</div>
+          <div class="lat-badge" style="font-size:13px;" id="latSlVal">0 ms</div>
+        </div>
+        <input type="range" class="lat-sl" id="latSlider" min="-200" max="200" value="0" oninput="setLatComp(this.value)">
+        <div style="display:flex;justify-content:space-between;margin-top:2px;">
+          <span style="font-size:7px;color:var(--chr);opacity:.4;">-200ms</span>
+          <span style="font-size:7px;color:var(--chr);opacity:.4;">+200ms</span>
+        </div>
+      </div>
+
+      <!-- MARKERS -->
+      <div style="background:#0a0f08;border:1px solid #1a2010;border-radius:3px;padding:5px;">
+        <div style="font-size:7px;color:var(--chr);opacity:.6;margin-bottom:4px;">MARKERS</div>
+        <div style="display:flex;gap:3px;">
+          <button class="btn-bak" onclick="addMarkerAtCursor()" style="flex:1;padding:4px 2px;font-size:8px;">＋ MRK</button>
+          <button class="btn-bak" onclick="clearAllMarkers()" style="flex:1;padding:4px 2px;font-size:8px;">✕ CLR</button>
+        </div>
+        <div id="mrkList" style="margin-top:4px;max-height:50px;overflow-y:auto;font-size:8px;font-family:'Share Tech Mono';color:var(--chr);opacity:.7;"></div>
+      </div>
+
+      <!-- TRANSPORT -->
+      <button class="btn-grn" onclick="playAll()" style="padding:8px 4px;width:100%;font-size:9px;">▶ PLAY MIX</button>
+      <button class="btn-stp" onclick="stopAll()" style="padding:8px 4px;width:100%;font-size:9px;">■ STOP ALL</button>
+
+      <!-- DAW TOOLS -->
+      <button class="btn-bak" onclick="undoLast()" style="padding:5px;width:100%;font-size:8px;">↩ UNDO LAST</button>
+      <div style="display:flex;gap:3px;">
+        <button class="btn-bak" onclick="saveSession()" style="flex:1;padding:4px 2px;font-size:7px;">💾 SAVE</button>
+        <button class="btn-bak" onclick="loadSession()" style="flex:1;padding:4px 2px;font-size:7px;">📂 LOAD</button>
+      </div>
+      <button class="btn-chr" onclick="exportMix()" style="padding:6px;width:100%;font-size:8px;">⬇ MIX WAV</button>
+      <button class="btn-bak" onclick="exportStems()" style="padding:4px;width:100%;font-size:7px;">⬇ STEMS WAV</button>
+
+      <div style="flex:1;"></div>
+      <div style="text-align:center;border-top:1px solid rgba(192,200,184,.1);padding-top:4px;">
+        <div style="font-family:'Orbitron',monospace;font-size:6px;color:var(--amb);opacity:.4;letter-spacing:.2em;">AMPEX · 200A · v3</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <div class="screw" style="width:10px;height:10px;"></div>
+        <div class="screw" style="width:10px;height:10px;"></div>
+      </div>
+    </div>
+
+    <!-- ══ CHANNELS ══ -->
+    <div id="chCont" style="flex:1;padding:5px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;min-width:0;"></div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ENGINE
+══════════════════════════════════════════════════════════ -->
+<script>
+// ───────────────────────────────────────────────────────────
+//  CONSTANTS & STATE
+// ───────────────────────────────────────────────────────────
+const NUM    = 4;
+const COLORS = ['#d4a017','#7ab648','#4a8abd','#bd4a6a'];
+const LABELS = ['TRACK I','TRACK II','TRACK III','TRACK IV'];
+
+let AC = null, micStream = null, micSrc = null;
+let masterGain = null, masterSplit = null, masterAnL = null, masterAnR = null;
+let rafId = null, timerIv = null, timeStart = 0;
+let metroIv = null, metroBeat = 0, metroOn = false;
+let tapTimes = [], tapReset = null;
+let isPlaying = false, anyRec = false;
+let idb = null;
+let pkValL = 0, pkValR = 0, pkTimL = null, pkTimR = null;
+
+// ── Cursor / seek
+let seekPos   = 0;       // seconds — where playback starts
+let cursorPos = 0;       // seconds — live playhead position during play
+let playStartAC = 0;     // AC.currentTime when play started
+
+// ── Latency
+let globalLatencyMs  = 0;   // auto-calibrated
+let manualLatencyMs  = 0;   // slider
+let totalLatencyMs   = () => globalLatencyMs + manualLatencyMs;
+
+// ── Markers [{time, label, color}]
+let markers = [];
+let pendingMarkerX = 0, pendingMarkerTrack = -1;
+
+// ── Calibration
+let calRec = null, calChunks = [], calTicks = [], calRunning = false;
+
+const ch = Array.from({length:NUM},(_,i)=>({
+  id:i, buf:null, rec:null, chunks:[], isRec:false,
+  isMon:false, monNode:null,
+  gainNode:null, panNode:null, anal:null, pbAnal:null, pbSrc:null,
+  vol:1.0, pan:0, muted:false, soloed:false,
+  history:[], peakV:0, peakT:null,
+}));
+
+// ───────────────────────────────────────────────────────────
+//  INIT AUDIO
+// ───────────────────────────────────────────────────────────
+async function initAudio(){
+  const btn = document.getElementById('initBtn');
+  const msg = document.getElementById('permMsg');
+  const steps = document.getElementById('permSteps');
+  btn.textContent = '⏳ SOLICITANDO PERMISOS…'; btn.disabled = true;
+  msg.style.display = 'none'; steps.style.display = 'none';
+
+  if (!window.isSecureContext && location.protocol === 'file:') {
+    showPermErr('Archivo local (file://) — Chrome bloquea el mic. Sirve con un servidor local o usa chrome://flags/#unsafely-treat-insecure-origin-as-secure');
+    btn.textContent = '▶ INICIALIZAR SISTEMA DE AUDIO'; btn.disabled = false; return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showPermErr('Tu navegador no soporta getUserMedia. Usa Chrome Android actualizado.');
+    btn.textContent = '▶ INICIALIZAR SISTEMA DE AUDIO'; btn.disabled = false; return;
+  }
+  try {
+    const ps = await navigator.permissions.query({name:'microphone'});
+    if (ps.state === 'denied') { steps.style.display='block'; showPermErr('Permiso bloqueado. Sigue los pasos abajo.'); btn.textContent='▶ INICIALIZAR SISTEMA DE AUDIO'; btn.disabled=false; return; }
+  } catch(e){}
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({audio:{
+      echoCancellation:false,noiseSuppression:false,autoGainControl:false,
+      channelCount:1,sampleRate:{ideal:48000},latency:{ideal:0},
+      googEchoCancellation:false,googNoiseSuppression:false,
+      googAutoGainControl:false,googHighpassFilter:false,
+    }});
+  } catch(e1){
+    try { stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch(e2){ handleMicErr(e2); btn.textContent='▶ INICIALIZAR SISTEMA DE AUDIO'; btn.disabled=false; return; }
+  }
+
+  micStream = stream;
+  AC = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive', sampleRate:48000});
+  if (AC.state==='suspended') await AC.resume();
+
+  micSrc = AC.createMediaStreamSource(micStream);
+  masterGain = AC.createGain(); masterGain.gain.value=1;
+  masterSplit = AC.createChannelSplitter(2);
+  masterAnL = AC.createAnalyser(); masterAnL.fftSize=256; masterAnL.smoothingTimeConstant=0.7;
+  masterAnR = AC.createAnalyser(); masterAnR.fftSize=256; masterAnR.smoothingTimeConstant=0.7;
+  masterGain.connect(masterSplit);
+  masterSplit.connect(masterAnL,0); masterSplit.connect(masterAnR,1);
+  masterGain.connect(AC.destination);
+
+  ch.forEach(c=>{
+    c.gainNode = AC.createGain(); c.gainNode.gain.value=c.vol;
+    c.panNode  = AC.createStereoPanner(); c.panNode.pan.value=c.pan;
+    c.anal     = AC.createAnalyser(); c.anal.fftSize=256; c.anal.smoothingTimeConstant=0.75;
+    c.gainNode.connect(c.panNode); c.panNode.connect(masterGain);
+  });
+
+  await openIDB();
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('app').style.display='flex';
+  buildUI();
+  startVU();
+  updateLatBadge();
+  setStatus('STANDBY');
+  toast('✓ Sistema inicializado — v3');
+  await tryAutoLoad();
+  if ('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(()=>{});
+}
+
+function showPermErr(m){ const el=document.getElementById('permMsg'); el.innerHTML=m; el.style.display='block'; }
+function handleMicErr(e){
+  const s=document.getElementById('permSteps');
+  if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'){s.style.display='block';showPermErr('⚠ Micrófono denegado.');}
+  else if(e.name==='NotFoundError') showPermErr('⚠ No se encontró micrófono.');
+  else showPermErr('⚠ Error: '+e.message);
+}
+
+// ───────────────────────────────────────────────────────────
+//  BUILD UI
+// ───────────────────────────────────────────────────────────
+function buildUI(){
+  const cont = document.getElementById('chCont'); cont.innerHTML='';
+  ch.forEach((c,i)=>{
+    const d = document.createElement('div');
+    d.className='ch-strip'; d.id=`strip${i}`;
+    d.innerHTML=`
+    <!-- NUMBER -->
+    <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px;">
+      <div class="ch-num">${i+1}</div>
+      <div class="tlab" style="font-size:7px;color:${COLORS[i]};opacity:.9;">${LABELS[i]}</div>
+    </div>
+    <!-- VU -->
+    <div style="display:flex;flex-direction:column;gap:2px;width:70px;flex-shrink:0;">
+      <div style="font-size:7px;color:var(--chr);opacity:.45;">IN</div>
+      <div class="vu-c" style="height:9px;"><div class="vu-s"></div><div class="vu-b" id="vu${i}"></div><div class="vu-p" id="pk${i}"></div></div>
+      <div style="font-size:7px;color:var(--chr);opacity:.45;margin-top:1px;">PB</div>
+      <div class="vu-c" style="height:9px;"><div class="vu-s"></div><div class="vu-b" id="vuPb${i}"></div></div>
+    </div>
+    <!-- WAVEFORM + CURSOR + MARKERS -->
+    <div class="wave-wrap" id="ww${i}">
+      <canvas class="wv" id="wave${i}" height="44" style="border-color:rgba(${hexRgb(COLORS[i])},.22);"></canvas>
+      <div class="wave-cursor" id="cur${i}"></div>
+      <div class="wave-seek-ghost" id="ghost${i}"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:1px;">
+        <div id="wlbl${i}" style="font-size:7px;font-family:'Share Tech Mono';color:var(--chr);opacity:.4;">NO AUDIO</div>
+        <div id="wdur${i}" style="font-size:7px;font-family:'Share Tech Mono';color:${COLORS[i]};opacity:.65;"></div>
+      </div>
+    </div>
+    <!-- PAN -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;">
+      <div style="font-size:7px;color:var(--chr);opacity:.4;">PAN</div>
+      <div class="pan-knob" id="pk${i}k"><div class="pan-dot" id="pd${i}"></div></div>
+      <div id="plbl${i}" style="font-size:7px;font-family:'Share Tech Mono';color:var(--chr);opacity:.5;text-align:center;">C</div>
+    </div>
+    <!-- MUTE SOLO MON LED -->
+    <div style="display:flex;flex-direction:column;gap:4px;align-items:center;flex-shrink:0;">
+      <div style="display:flex;gap:3px;">
+        <button class="btn-mute" id="mute${i}" onclick="toggleMute(${i})">M</button>
+        <button class="btn-solo" id="solo${i}" onclick="toggleSolo(${i})">S</button>
+      </div>
+      <div style="font-size:7px;color:var(--chr);opacity:.45;">MON</div>
+      <div class="mon-tog" id="mon${i}" onclick="toggleMon(${i})"></div>
+      <div class="led" id="led${i}"></div>
+    </div>
+    <!-- VOL FADER -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;">
+      <div style="font-size:7px;color:var(--chr);opacity:.4;">VOL</div>
+      <input type="range" class="fader" id="vol${i}" min="0" max="1.5" step="0.01" value="1" oninput="setVol(${i},this.value)">
+      <div id="vlbl${i}" style="font-size:7px;font-family:'Share Tech Mono';color:var(--chr);opacity:.45;margin-top:1px;">0dB</div>
+    </div>
+    <!-- REC / IMPORT / CLR / UNDO -->
+    <div style="display:flex;flex-direction:column;gap:3px;align-items:center;flex-shrink:0;">
+      <div class="btn-rec" id="rec${i}" onclick="toggleRec(${i})" style="width:40px;height:40px;">REC</div>
+      <label class="drop-zone" title="Importar WAV/MP3/OGG" style="width:44px;">
+        📂<input type="file" accept="audio/*,.wav,.mp3,.ogg,.flac" style="display:none;" onchange="importAudio(${i},this)">
+      </label>
+      <button class="btn-bak" onclick="clearCh(${i})" style="font-size:8px;padding:2px 5px;">CLR</button>
+      <button class="btn-bak" onclick="undoCh(${i})" style="font-size:8px;padding:2px 5px;" title="Undo track">↩</button>
+    </div>`;
+    cont.appendChild(d);
+    setupPan(i);
+    setupWaveClick(i);
+    setupWaveHover(i);
+  });
+}
+
+function hexRgb(h){ const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return`${r},${g},${b}`; }
+
+// ───────────────────────────────────────────────────────────
+//  WAVEFORM CLICK → SEEK
+// ───────────────────────────────────────────────────────────
+function setupWaveClick(i){
+  const ww = () => document.getElementById(`ww${i}`);
+  const handler = e => {
+    if (!ch[i].buf) return;
+    const rect = document.getElementById(`wave${i}`).getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const ratio = Math.max(0, Math.min(1, x / rect.width));
+    seekPos = ratio * ch[i].buf.duration;
+    updateSeekDisp();
+    drawAllCursors(); // show cursor at seek pos on all tracks
+    // Right-click or long-press → marker menu
+    document.getElementById('hCur').className = 'led cyn';
+    toast(`SEEK → ${seekPos.toFixed(2)}s | Long-press para marcador`);
+  };
+  // Tap to seek
+  document.getElementById(`wave${i}`).addEventListener('click', handler);
+  // Long press → marker menu
+  let lpTimer;
+  document.getElementById(`wave${i}`).addEventListener('touchstart', e=>{
+    lpTimer = setTimeout(()=>{ openMarkerMenu(e.touches[0].clientX, e.touches[0].clientY, i, e); }, 600);
+  },{passive:true});
+  document.getElementById(`wave${i}`).addEventListener('touchend',  ()=>clearTimeout(lpTimer));
+  document.getElementById(`wave${i}`).addEventListener('contextmenu', e=>{ e.preventDefault(); openMarkerMenu(e.clientX, e.clientY, i, e); });
+}
+
+function setupWaveHover(i){
+  const canvas = () => document.getElementById(`wave${i}`);
+  const ghost  = () => document.getElementById(`ghost${i}`);
+  canvas().addEventListener('mousemove', e=>{
+    if (!ch[i].buf) return;
+    const rect = canvas().getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const g = ghost(); if(g){ g.style.left=x+'px'; g.style.opacity='1'; }
+  });
+  canvas().addEventListener('mouseleave',()=>{ const g=ghost(); if(g) g.style.opacity='0'; });
+}
+
+function updateSeekDisp(){
+  document.getElementById('seekDisp').textContent = `SEEK: ${seekPos.toFixed(2)}s`;
+}
+
+// ───────────────────────────────────────────────────────────
+//  CURSOR DRAWING ON ALL WAVEFORMS
+// ───────────────────────────────────────────────────────────
+function drawAllCursors(){
+  ch.forEach((c,i)=>{
+    const cur  = document.getElementById(`cur${i}`);
+    const canvas = document.getElementById(`wave${i}`);
+    if (!cur || !canvas) return;
+    if (!c.buf){ cur.classList.remove('visible'); return; }
+    const ratio = seekPos / c.buf.duration;
+    const x = ratio * canvas.offsetWidth;
+    cur.style.left = x + 'px';
+    cur.classList.add('visible');
+  });
+}
+
+function updateCursorsDuringPlay(){
+  if (!isPlaying || anyRec) return;
+  const elapsed = (AC.currentTime - playStartAC) + seekPos;
+  ch.forEach((c,i)=>{
+    const cur = document.getElementById(`cur${i}`);
+    const canvas = document.getElementById(`wave${i}`);
+    if (!cur || !canvas || !c.buf) return;
+    const ratio = Math.min(elapsed / c.buf.duration, 1);
+    cur.style.left = (ratio * canvas.offsetWidth) + 'px';
+    cur.classList.add('visible');
+  });
+  const el = document.getElementById('timeD');
+  if (el){ const s=elapsed; const m=Math.floor(s/60).toString().padStart(2,'0'); const ss=(s%60).toFixed(1).padStart(4,'0'); el.textContent=`${m}:${ss}`; }
+}
+
+// ───────────────────────────────────────────────────────────
+//  MARKERS
+// ───────────────────────────────────────────────────────────
+function openMarkerMenu(cx, cy, trackIdx, e){
+  if (e) e.preventDefault();
+  pendingMarkerTrack = trackIdx;
+  // estimate time from click position
+  const canvas = document.getElementById(`wave${trackIdx}`);
+  if (canvas){
+    const rect = canvas.getBoundingClientRect();
+    const x = cx - rect.left;
+    const ratio = Math.max(0, Math.min(1, x / rect.width));
+    if (ch[trackIdx].buf) pendingMarkerX = ratio * ch[trackIdx].buf.duration;
+    else pendingMarkerX = seekPos;
+  }
+  const menu = document.getElementById('mrk-menu');
+  menu.style.left = cx+'px'; menu.style.top = cy+'px';
+  menu.classList.add('show');
+  setTimeout(()=>document.addEventListener('click',()=>menu.classList.remove('show'),{once:true}),100);
+}
+
+function addMarkerAtCursor(){
+  const t = pendingMarkerX || seekPos;
+  const label = String.fromCharCode(65+markers.length); // A, B, C…
+  markers.push({time:t, label});
+  document.getElementById('mrk-menu').classList.remove('show');
+  redrawAllWaves();
+  updateMarkerList();
+  toast(`Marcador ${label} @ ${t.toFixed(2)}s`);
+}
+
+function clearAllMarkers(){
+  markers=[];
+  document.getElementById('mrk-menu').classList.remove('show');
+  redrawAllWaves();
+  updateMarkerList();
+  toast('Marcadores borrados');
+}
+
+function updateMarkerList(){
+  const el=document.getElementById('mrkList');
+  if(!el) return;
+  el.innerHTML = markers.map(m=>`<div style="cursor:pointer;padding:1px 0;" onclick="seekToMarker(${m.time})">▸ ${m.label} @ ${m.time.toFixed(2)}s</div>`).join('');
+}
+
+function seekToMarker(t){
+  seekPos = t; updateSeekDisp(); drawAllCursors();
+  toast(`SEEK → Marcador @ ${t.toFixed(2)}s`);
+}
+
+function redrawAllWaves(){
+  ch.forEach((c,i)=>{ if(c.buf) drawWave(i,c.buf); });
+  drawAllCursors();
+}
+
+// ───────────────────────────────────────────────────────────
+//  PAN KNOB
+// ───────────────────────────────────────────────────────────
+function setupPan(i){
+  const knob = document.getElementById(`pk${i}k`);
+  let sY=0, sP=0;
+  const move = e=>{ const y=e.touches?e.touches[0].clientY:e.clientY; ch[i].pan=Math.max(-1,Math.min(1,sP+(sY-y)/75)); applyPan(i); };
+  const end  = ()=>{ document.removeEventListener('mousemove',move); document.removeEventListener('mouseup',end); document.removeEventListener('touchmove',move); document.removeEventListener('touchend',end); };
+  knob.addEventListener('mousedown',  e=>{ sY=e.clientY;sP=ch[i].pan; document.addEventListener('mousemove',move); document.addEventListener('mouseup',end); e.preventDefault(); });
+  knob.addEventListener('touchstart', e=>{ sY=e.touches[0].clientY;sP=ch[i].pan; document.addEventListener('touchmove',move,{passive:false}); document.addEventListener('touchend',end); e.preventDefault(); },{passive:false});
+  knob.addEventListener('dblclick',   ()=>{ ch[i].pan=0; applyPan(i); });
+}
+function applyPan(i){
+  if(ch[i].panNode) ch[i].panNode.pan.value=ch[i].pan;
+  const deg=ch[i].pan*130;
+  const dot=document.getElementById(`pd${i}`); if(dot) dot.style.transform=`translateX(-50%) rotate(${deg}deg)`;
+  const lbl=document.getElementById(`plbl${i}`); if(lbl) lbl.textContent=ch[i].pan===0?'C':ch[i].pan>0?`R${Math.round(ch[i].pan*100)}`:`L${Math.round(-ch[i].pan*100)}`;
+}
+
+// ───────────────────────────────────────────────────────────
+//  VOLUME
+// ───────────────────────────────────────────────────────────
+function setVol(i,v){
+  ch[i].vol=parseFloat(v);
+  if(ch[i].gainNode) ch[i].gainNode.gain.value=ch[i].vol;
+  if(ch[i].monNode)  ch[i].monNode.gain.value=ch[i].vol;
+  const db=parseFloat(v)===0?'-∞':(20*Math.log10(parseFloat(v))).toFixed(1);
+  const el=document.getElementById(`vlbl${i}`); if(el) el.textContent=db+'dB';
+}
+
+// ───────────────────────────────────────────────────────────
+//  LATENCY COMPENSATION
+// ───────────────────────────────────────────────────────────
+function setLatComp(v){
+  manualLatencyMs=parseInt(v);
+  document.getElementById('latSlVal').textContent=v+' ms';
+  updateLatBadge();
+}
+function updateLatBadge(){
+  const t=totalLatencyMs();
+  const el=document.getElementById('latBadge'); if(el) el.textContent=`LAT: ${t}ms`;
+}
+
+// ───────────────────────────────────────────────────────────
+//  MUTE / SOLO
+// ───────────────────────────────────────────────────────────
+function toggleMute(i){ ch[i].muted=!ch[i].muted; document.getElementById(`mute${i}`).className='btn-mute'+(ch[i].muted?' on':''); document.getElementById(`strip${i}`).classList.toggle('muted',ch[i].muted); applyGains(); }
+function toggleSolo(i){ ch[i].soloed=!ch[i].soloed; document.getElementById(`solo${i}`).className='btn-solo'+(ch[i].soloed?' on':''); applyGains(); }
+function applyGains(){ const s=ch.some(c=>c.soloed); ch.forEach(c=>{ if(!c.gainNode) return; c.gainNode.gain.value=(c.muted?false:(s?c.soloed:true))?c.vol:0; }); }
+
+// ───────────────────────────────────────────────────────────
+//  MONITOR
+// ───────────────────────────────────────────────────────────
+function toggleMon(i){
+  const c=ch[i]; c.isMon=!c.isMon;
+  document.getElementById(`mon${i}`).className='mon-tog'+(c.isMon?' on':'');
+  if(c.isMon){
+    if(!c.monNode){ c.monNode=AC.createGain(); c.monNode.gain.value=c.vol; micSrc.connect(c.monNode); c.monNode.connect(masterGain); }
+    try{ micSrc.connect(c.anal); }catch(e){}
+    toast(`CH${i+1} MON ON — escuchas el mic en tiempo real`);
+  } else {
+    if(c.monNode&&!c.isRec){ try{c.monNode.disconnect();micSrc.disconnect(c.monNode);}catch(e){} c.monNode=null; }
+    if(!c.isRec){ try{micSrc.disconnect(c.anal);}catch(e){} }
+    toast(`CH${i+1} MON OFF`);
+  }
+}
+
+// ───────────────────────────────────────────────────────────
+//  RECORD  (with latency-compensated trimming)
+// ───────────────────────────────────────────────────────────
+function toggleRec(i){ ch[i].isRec?stopRec(i):startRec(i); }
+
+async function startRec(i){
+  if(anyRec){ toast('Ya hay una pista grabando'); return; }
+  if(AC.state==='suspended') await AC.resume();
+  const c=ch[i]; c.chunks=[];
+  const mime=getMime();
+  c.rec=new MediaRecorder(micStream,{mimeType:mime});
+  c.rec.ondataavailable=e=>{ if(e.data.size>0) c.chunks.push(e.data); };
+  c.rec.onstop=()=>finalizeRec(i);
+  c.rec.start(100);
+  c.isRec=true; anyRec=true; isPlaying=true;
+
+  // Mic → analyser for VU
+  try{ micSrc.connect(c.anal); }catch(e){}
+
+  // Monitor: only if user explicitly enabled it
+  // (auto-mute monitor during rec to avoid guitar echo)
+  if(c.isMon && !c.monNode){
+    c.monNode=AC.createGain(); c.monNode.gain.value=c.vol;
+    micSrc.connect(c.monNode); c.monNode.connect(masterGain);
+  }
+
+  // Overdub: play all other tracks from seekPos
+  ch.forEach((o,j)=>{ if(j!==i && o.buf) playCh(j); });
+
+  // UI
+  document.getElementById(`rec${i}`).classList.add('recording');
+  document.getElementById(`strip${i}`).classList.add('recording');
+  document.getElementById(`led${i}`).className='led red';
+  document.getElementById('hRec').className='led red';
+  setWL(i,'● RECORDING','#ff4422');
+  setStatus(`● REC CH${i+1}`);
+  playStartAC=AC.currentTime;
+  startTimer(); spinReels(true);
+}
+
+function stopRec(i){
+  const c=ch[i]; if(!c.isRec) return;
+  c.rec.stop(); c.isRec=false; anyRec=false;
+  stopAllPb();
+  if(!c.isMon){ try{micSrc.disconnect(c.anal);}catch(e){} }
+  if(!c.isMon&&c.monNode){ try{c.monNode.disconnect();micSrc.disconnect(c.monNode);}catch(e){} c.monNode=null; }
+  document.getElementById(`rec${i}`).classList.remove('recording');
+  document.getElementById(`strip${i}`).classList.remove('recording');
+  document.getElementById(`led${i}`).className='led';
+  document.getElementById('hRec').className='led';
+  stopTimer(); spinReels(false); setStatus('STANDBY');
+  setWL(i,'PROCESANDO…','');
+}
+
+async function finalizeRec(i){
+  const c=ch[i];
+  const blob=new Blob(c.chunks,{type:getMime()});
+  try{
+    const ab=await blob.arrayBuffer();
+    let buf=await AC.decodeAudioData(ab);
+
+    // ── PUNCH-SYNC: trim silence based on total latency ──
+    const trimSec = totalLatencyMs()/1000 + (AC.outputLatency||0);
+    if(trimSec>0 && trimSec<buf.duration-0.05){
+      const trimFrames = Math.floor(trimSec*buf.sampleRate);
+      const newLen     = buf.length - trimFrames;
+      if(newLen>0){
+        const trimmed=AC.createBuffer(buf.numberOfChannels,newLen,buf.sampleRate);
+        for(let ch2=0;ch2<buf.numberOfChannels;ch2++){
+          const src=buf.getChannelData(ch2);
+          trimmed.copyToChannel(src.subarray(trimFrames),ch2);
+        }
+        buf=trimmed;
+      }
+    }
+
+    if(c.buf) c.history.push(c.buf);
+    if(c.history.length>10) c.history.shift();
+    c.buf=buf;
+    drawWave(i,buf);
+    setWL(i,'AUDIO READY',COLORS[i]);
+    document.getElementById(`wdur${i}`).textContent=buf.duration.toFixed(1)+'s';
+    document.getElementById(`strip${i}`).classList.add('has-audio');
+    document.getElementById(`strip${i}`).classList.remove('recording');
+    document.getElementById(`led${i}`).className='led amb';
+    drawAllCursors();
+    autoSave();
+    toast(`✓ CH${i+1} grabada — ${buf.duration.toFixed(1)}s (trim: ${(trimSec*1000).toFixed(0)}ms)`);
+  }catch(e){ console.error(e); setWL(i,'ERROR DECODE','#ff4422'); toast('Error: '+e.message); }
+}
+
+// ───────────────────────────────────────────────────────────
+//  IMPORT AUDIO (WAV/MP3/OGG/FLAC via decodeAudioData)
+// ───────────────────────────────────────────────────────────
+async function importAudio(i, input){
+  const file=input.files[0]; if(!file) return;
+  toast(`Importando ${file.name}…`);
+  try{
+    const ab=await file.arrayBuffer();
+    const buf=await AC.decodeAudioData(ab);
+    const c=ch[i];
+    if(c.buf) c.history.push(c.buf);
+    c.buf=buf;
+    drawWave(i,buf);
+    setWL(i,'IMPORTED',COLORS[i]);
+    document.getElementById(`wdur${i}`).textContent=buf.duration.toFixed(1)+'s';
+    document.getElementById(`strip${i}`).classList.add('has-audio');
+    document.getElementById(`led${i}`).className='led amb';
+    drawAllCursors();
+    autoSave();
+    toast(`✓ CH${i+1} importado: ${file.name} (${buf.duration.toFixed(1)}s)`);
+  }catch(e){ toast('Error importando: '+e.message); }
+  input.value=''; // reset input
+}
+
+// ───────────────────────────────────────────────────────────
+//  PUNCH-SYNC CALIBRATION
+// ───────────────────────────────────────────────────────────
+function openCalibration(){
+  if(!metroOn){ toast('Activa el metrónomo primero'); return; }
+  document.getElementById('cal-ov').classList.add('show');
+  document.getElementById('calResult').textContent='LISTO PARA CALIBRAR';
+  document.getElementById('calStartBtn').disabled=false;
+  document.getElementById('calStopBtn').disabled=true;
+}
+
+function startCalRec(){
+  if(!AC||!micStream){ toast('Audio no inicializado'); return; }
+  calChunks=[]; calTicks=[];
+  calRunning=true;
+  document.getElementById('calStartBtn').disabled=true;
+  document.getElementById('calStopBtn').disabled=false;
+  document.getElementById('calResult').textContent='● GRABANDO…';
+
+  // Record the tick times as they happen
+  const origClick=clickTick;
+  const tickWrapper=function(accent){ origClick(accent); if(calRunning) calTicks.push(AC.currentTime); };
+  window._calTickWrapper=tickWrapper;
+
+  const mime=getMime();
+  calRec=new MediaRecorder(micStream,{mimeType:mime});
+  calRec.ondataavailable=e=>{ if(e.data.size>0) calChunks.push(e.data); };
+  calRec.onstop=analyzeCalibration;
+  calRec.start(50);
+
+  // Auto-stop after 5 seconds
+  setTimeout(()=>{ if(calRunning) stopCalRec(); }, 5000);
+  toast('Calibrando — escucha los ticks…');
+}
+
+function stopCalRec(){
+  calRunning=false;
+  document.getElementById('calStartBtn').disabled=false;
+  document.getElementById('calStopBtn').disabled=true;
+  if(calRec&&calRec.state==='recording') calRec.stop();
+}
+
+async function analyzeCalibration(){
+  const blob=new Blob(calChunks,{type:getMime()});
+  try{
+    const ab=await blob.arrayBuffer();
+    const buf=await AC.decodeAudioData(ab);
+    const data=buf.getChannelData(0);
+    const sr=buf.sampleRate;
+
+    // Find peaks (transients) in recorded audio = when the mic heard the tick
+    const peaks=[];
+    const threshold=0.08;
+    let hold=0;
+    for(let i=0;i<data.length;i++){
+      if(Math.abs(data[i])>threshold && hold<=0){
+        peaks.push(i/sr);
+        hold=Math.floor(sr*0.15); // 150ms hold off
+      }
+      if(hold>0) hold--;
+    }
+
+    if(peaks.length<2 || calTicks.length<2){
+      document.getElementById('calResult').textContent='POCAS MUESTRAS — repite';
+      return;
+    }
+
+    // Estimate latency as mean difference between generated tick time and detected peak
+    // We offset calTicks by recording start time (first calTick - first peak approach)
+    const diffs=[];
+    const minLen=Math.min(peaks.length,calTicks.length);
+    // calTicks are in AC time; peaks are in seconds from recording start
+    // recording started right when calRec.start() was called
+    // We use first-peak vs first-tick as base
+    const baseOff=calTicks[0]-peaks[0];
+    for(let i=0;i<minLen;i++) diffs.push((calTicks[i]-peaks[i])-baseOff);
+    const meanDiff=diffs.reduce((a,b)=>a+b,0)/diffs.length;
+    const latMs=Math.round(meanDiff*1000);
+    globalLatencyMs=latMs;
+
+    // Also update slider display
+    document.getElementById('latSlVal').textContent=latMs+' ms';
+    document.getElementById('latSlider').value=latMs;
+    manualLatencyMs=0; // reset manual since we have auto
+    updateLatBadge();
+
+    document.getElementById('calResult').textContent=`✓ LATENCIA: ${latMs} ms`;
+    toast(`PUNCH-SYNC calibrado: ${latMs}ms`);
+  }catch(e){
+    document.getElementById('calResult').textContent='ERROR: '+e.message;
+  }
+}
+
+// Override clickTick to also record timing for calibration
+function clickTick(accent){
+  if(!AC) return;
+  if(calRunning && window._calTickWrapper){ window._calTickWrapper(accent); return; }
+  const o=AC.createOscillator(), g=AC.createGain();
+  o.connect(g); g.connect(AC.destination);
+  o.frequency.value=accent?1400:900;
+  g.gain.setValueAtTime(accent?0.4:0.22,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.08);
+  o.start(AC.currentTime); o.stop(AC.currentTime+0.1);
+}
+
+// ───────────────────────────────────────────────────────────
+//  UNDO
+// ───────────────────────────────────────────────────────────
+function undoCh(i){
+  const c=ch[i]; if(!c.history.length){ toast(`CH${i+1}: sin historial`); return; }
+  c.buf=c.history.pop();
+  drawWave(i,c.buf); setWL(i,'UNDO RESTORED',COLORS[i]);
+  document.getElementById(`wdur${i}`).textContent=c.buf.duration.toFixed(1)+'s';
+  document.getElementById(`strip${i}`).classList.add('has-audio');
+  document.getElementById(`led${i}`).className='led amb';
+  drawAllCursors(); toast(`↩ Undo CH${i+1}`); autoSave();
+}
+function undoLast(){
+  let li=-1,ll=0; ch.forEach((c,i)=>{ if(c.history.length>ll){ll=c.history.length;li=i;} });
+  if(li>=0) undoCh(li); else toast('Nada que deshacer');
+}
+
+// ───────────────────────────────────────────────────────────
+//  PLAYBACK — with seek support
+// ───────────────────────────────────────────────────────────
+function playAll(){
+  if(AC.state==='suspended') AC.resume();
+  stopAllPb(); isPlaying=true;
+  const anySolo=ch.some(c=>c.soloed);
+  let maxDur=0, any=false;
+  ch.forEach((c,i)=>{
+    if(!c.buf) return;
+    const active=c.muted?false:(anySolo?c.soloed:true);
+    if(active){ playCh(i); if(c.buf.duration>maxDur) maxDur=c.buf.duration; any=true; }
+  });
+  if(any){
+    setStatus('▶ PLAYING'); document.getElementById('hPlay').className='led grn';
+    playStartAC=AC.currentTime;
+    startTimer(); spinReels(true);
+    const remaining=maxDur-seekPos;
+    setTimeout(()=>{ if(isPlaying&&!anyRec) stopAll(); }, Math.max(100,remaining+300));
+  } else toast('No hay audio grabado');
+}
+
+function playCh(i){
+  const c=ch[i]; if(!c.buf) return;
+  if(c.pbSrc){ try{c.pbSrc.stop();}catch(e){} }
+  const src=AC.createBufferSource(); src.buffer=c.buf;
+  const g=AC.createGain(); g.gain.value=c.vol;
+  c.pbAnal=AC.createAnalyser(); c.pbAnal.fftSize=256; c.pbAnal.smoothingTimeConstant=0.7;
+  src.connect(g); g.connect(c.pbAnal); g.connect(c.panNode);
+  // Start from seekPos
+  const offset=Math.min(seekPos, c.buf.duration-0.01);
+  src.start(0, offset);
+  c.pbSrc=src;
+  document.getElementById(`led${i}`).className='led grn';
+  src.onended=()=>{ if(!c.isRec) document.getElementById(`led${i}`).className=c.buf?'led amb':'led'; };
+}
+
+function stopAllPb(){
+  ch.forEach((c,i)=>{
+    if(c.pbSrc){ try{c.pbSrc.stop();}catch(e){} c.pbSrc=null; c.pbAnal=null; }
+    if(!c.isRec) document.getElementById(`led${i}`).className=c.buf?'led amb':'led';
+  });
+}
+
+function stopAll(){
+  if(anyRec) ch.forEach((_,i)=>{ if(ch[i].isRec) stopRec(i); });
+  stopAllPb(); isPlaying=false;
+  setStatus('STANDBY'); document.getElementById('hPlay').className='led';
+  stopTimer(); spinReels(false);
+}
+
+function clearCh(i){
+  const c=ch[i]; if(c.isRec) return;
+  if(c.pbSrc){ try{c.pbSrc.stop();}catch(e){} c.pbSrc=null; }
+  if(c.buf) c.history.push(c.buf);
+  c.buf=null; c.chunks=[];
+  document.getElementById(`strip${i}`).classList.remove('has-audio');
+  document.getElementById(`led${i}`).className='led';
+  document.getElementById(`wdur${i}`).textContent='';
+  setWL(i,'NO AUDIO',''); clearWave(i);
+  autoSave(); toast(`CH${i+1} borrada`);
+}
+
+// ───────────────────────────────────────────────────────────
+//  METRONOME
+// ───────────────────────────────────────────────────────────
+function toggleMetro(){
+  metroOn=!metroOn;
+  const btn=document.getElementById('metBtn');
+  if(btn){ btn.textContent=metroOn?'CLICK ●':'CLICK'; btn.classList.toggle('active-btn',metroOn); }
+  if(metroOn){ if(AC.state==='suspended') AC.resume(); metroBeat=0; scheduleMetro(); }
+  else{ clearTimeout(metroIv); metroIv=null; [1,2,3,4].forEach(j=>{ const el=document.getElementById(`b${j}`); if(el) el.className='beat-led'; }); }
+}
+function scheduleMetro(){
+  if(!metroOn) return;
+  const bpm=parseInt(document.getElementById('bpmIn').value)||120;
+  metroBeat=(metroBeat%4)+1;
+  // Record tick time for calibration
+  if(calRunning){ calTicks.push(AC.currentTime); realClickTick(metroBeat===1); }
+  else realClickTick(metroBeat===1);
+  flashBeat(metroBeat);
+  document.getElementById('bpmDisp').textContent=bpm+' BPM';
+  metroIv=setTimeout(scheduleMetro,60000/bpm);
+}
+function realClickTick(accent){
+  if(!AC) return;
+  const o=AC.createOscillator(), g=AC.createGain();
+  o.connect(g); g.connect(AC.destination);
+  o.frequency.value=accent?1400:900;
+  g.gain.setValueAtTime(accent?0.42:0.22,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.08);
+  o.start(AC.currentTime); o.stop(AC.currentTime+0.1);
+}
+function flashBeat(b){
+  for(let j=1;j<=4;j++){ const el=document.getElementById(`b${j}`); if(el) el.className=j===b?(b===1?'beat-led hit1':'beat-led hit'):'beat-led'; }
+}
+function tapTempo(){
+  const now=Date.now(); tapTimes.push(now); if(tapTimes.length>8) tapTimes.shift();
+  clearTimeout(tapReset); tapReset=setTimeout(()=>tapTimes=[],3000);
+  if(tapTimes.length>=2){
+    const diffs=tapTimes.slice(1).map((t,i)=>t-tapTimes[i]);
+    const bpm=Math.max(40,Math.min(240,Math.round(60000/(diffs.reduce((a,b)=>a+b,0)/diffs.length))));
+    document.getElementById('bpmIn').value=bpm; document.getElementById('bpmDisp').textContent=bpm+' BPM';
+    if(metroOn){clearTimeout(metroIv);metroBeat=0;scheduleMetro();}
+    toast('TAP: '+bpm+' BPM');
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const bi=document.getElementById('bpmIn');
+  if(bi) bi.addEventListener('change',()=>{ document.getElementById('bpmDisp').textContent=(bi.value||120)+' BPM'; if(metroOn){clearTimeout(metroIv);metroBeat=0;scheduleMetro();} });
+});
+
+// ───────────────────────────────────────────────────────────
+//  WAVEFORM DRAWING (with markers)
+// ───────────────────────────────────────────────────────────
+function drawWave(i,buf){
+  const canvas=document.getElementById(`wave${i}`);
+  const W=canvas.offsetWidth||220; canvas.width=W;
+  const H=canvas.height;
+  const ctx=canvas.getContext('2d');
+  const data=buf.getChannelData(0);
+  const step=Math.ceil(data.length/W);
+  const col=COLORS[i];
+
+  ctx.fillStyle='#060802'; ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.035)'; ctx.lineWidth=1;
+  for(let x=0;x<W;x+=20){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+
+  // Seek highlight region (from 0 to seekPos)
+  if(seekPos>0 && seekPos<buf.duration){
+    const sx=Math.round((seekPos/buf.duration)*W);
+    ctx.fillStyle='rgba(0,255,200,.05)';
+    ctx.fillRect(0,0,sx,H);
+    ctx.strokeStyle='rgba(0,255,200,.35)'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,H);ctx.stroke();
+  }
+
+  // Waveform
+  ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=1.4;
+  ctx.shadowBlur=5; ctx.shadowColor=col;
+  for(let x=0;x<W;x++){
+    let mn=1,mx=-1;
+    for(let s=0;s<step;s++){const v=data[x*step+s]||0;if(v<mn)mn=v;if(v>mx)mx=v;}
+    const yMn=(1-(mn+1)/2)*H, yMx=(1-(mx+1)/2)*H;
+    if(x===0) ctx.moveTo(x,(yMn+yMx)/2);
+    ctx.lineTo(x,yMn); ctx.lineTo(x,yMx);
+  }
+  ctx.stroke(); ctx.shadowBlur=0;
+
+  // Draw markers
+  markers.forEach(m=>{
+    const mx=Math.round((m.time/buf.duration)*W);
+    ctx.strokeStyle='#d4a017'; ctx.lineWidth=2;
+    ctx.shadowBlur=6; ctx.shadowColor='rgba(212,160,23,.8)';
+    ctx.beginPath(); ctx.moveTo(mx,0); ctx.lineTo(mx,H); ctx.stroke();
+    ctx.shadowBlur=0;
+    // Label
+    ctx.fillStyle='rgba(212,160,23,.95)'; ctx.font='bold 9px Share Tech Mono';
+    ctx.fillText(m.label, mx+2, 10);
+  });
+}
+
+function clearWave(i){
+  const c=document.getElementById(`wave${i}`); if(!c) return;
+  c.width=c.offsetWidth||220;
+  const ctx=c.getContext('2d'); ctx.fillStyle='#060802'; ctx.fillRect(0,0,c.width,c.height);
+}
+
+// ───────────────────────────────────────────────────────────
+//  VU ANIMATION + CURSOR UPDATE (RAF loop)
+// ───────────────────────────────────────────────────────────
+function startVU(){
+  const arr=new Uint8Array(64);
+  function tick(){
+    rafId=requestAnimationFrame(tick);
+    ch.forEach((c,i)=>{
+      let lv=0; if(c.anal){c.anal.getByteFrequencyData(arr);lv=arr.reduce((s,v)=>s+v,0)/arr.length/255;}
+      const vuEl=document.getElementById(`vu${i}`); const pkEl=document.getElementById(`pk${i}`);
+      if(vuEl){ const pct=Math.min(lv*260,100); vuEl.style.width=pct+'%'; if(pct>(c.peakV||0)){c.peakV=pct;if(pkEl){pkEl.style.left=pct+'%';pkEl.style.opacity='1';}clearTimeout(c.peakT);c.peakT=setTimeout(()=>{c.peakV=0;if(pkEl)pkEl.style.opacity='0';},1600);} }
+      let pb=0; if(c.pbAnal){c.pbAnal.getByteFrequencyData(arr);pb=arr.reduce((s,v)=>s+v,0)/arr.length/255;}
+      const vuPb=document.getElementById(`vuPb${i}`); if(vuPb) vuPb.style.width=Math.min(pb*260,100)+'%';
+    });
+    [masterAnL,masterAnR].forEach((a,j)=>{
+      if(!a) return;
+      a.getByteFrequencyData(arr); const pct=Math.min(arr.reduce((s,v)=>s+v,0)/arr.length/255*300,100);
+      const el=document.getElementById(j===0?'mvuL':'mvuR'); const pk=document.getElementById(j===0?'mpkL':'mpkR');
+      if(el) el.style.width=pct+'%';
+      const cur2=j===0?pkValL:pkValR;
+      if(pct>cur2){ if(j===0){pkValL=pct;clearTimeout(pkTimL);pkTimL=setTimeout(()=>{pkValL=0;if(pk)pk.style.opacity='0';},1600);}else{pkValR=pct;clearTimeout(pkTimR);pkTimR=setTimeout(()=>{pkValR=0;if(pk)pk.style.opacity='0';},1600);} if(pk){pk.style.left=pct+'%';pk.style.opacity='1';} }
+    });
+    // Live cursor update during playback
+    if(isPlaying && !anyRec) updateCursorsDuringPlay();
+  }
+  tick();
+}
+
+// ───────────────────────────────────────────────────────────
+//  TIMER
+// ───────────────────────────────────────────────────────────
+function startTimer(){ stopTimer(); timeStart=Date.now(); timerIv=setInterval(()=>{ if(isPlaying&&!anyRec) return; /* handled by RAF during play */ const e=(Date.now()-timeStart)/1000; const m=Math.floor(e/60).toString().padStart(2,'0'); const s=(e%60).toFixed(1).padStart(4,'0'); document.getElementById('timeD').textContent=`${m}:${s}`; },100); }
+function stopTimer(){ clearInterval(timerIv); if(!isPlaying) document.getElementById('timeD').textContent='00:00.0'; }
+function spinReels(on){ ['reel1','reel2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.className='reel'+(on?' spin':''); }); }
+function setStatus(t){ const el=document.getElementById('statD'); if(el) el.textContent=t; }
+function setWL(i,t,color){ const el=document.getElementById(`wlbl${i}`); if(el){el.textContent=t;el.style.color=color||'';el.style.opacity=color?'1':'.4';} }
+
+// ───────────────────────────────────────────────────────────
+//  TOAST
+// ───────────────────────────────────────────────────────────
+let toastTmr;
+function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.style.opacity='1'; clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.style.opacity='0',2400); }
+
+// ───────────────────────────────────────────────────────────
+//  MIME
+// ───────────────────────────────────────────────────────────
+function getMime(){ for(const t of ['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/ogg','audio/mp4']) if(MediaRecorder.isTypeSupported(t)) return t; return ''; }
+
+// ───────────────────────────────────────────────────────────
+//  EXPORT
+// ───────────────────────────────────────────────────────────
+async function exportMix(){
+  if(!ch.some(c=>c.buf)){ toast('No hay audio'); return; }
+  const ov=document.getElementById('exp-ov'); const pct=document.getElementById('exp-pct');
+  ov.classList.add('show'); pct.textContent='0%';
+  try{
+    const anySolo=ch.some(c=>c.soloed);
+    const maxDur=Math.max(...ch.filter(c=>c.buf).map(c=>c.buf.duration));
+    const sr=AC.sampleRate, frames=Math.ceil(maxDur*sr);
+    const off=new OfflineAudioContext({numberOfChannels:2,length:frames,sampleRate:sr});
+    ch.forEach(c=>{
+      if(!c.buf) return;
+      const active=c.muted?false:(anySolo?c.soloed:true); if(!active) return;
+      const src=off.createBufferSource(); src.buffer=c.buf;
+      const g=off.createGain(); g.gain.value=c.vol;
+      const pan=off.createStereoPanner(); pan.pan.value=c.pan;
+      src.connect(g); g.connect(pan); pan.connect(off.destination); src.start(0);
+    });
+    pct.textContent='50%';
+    const rendered=await off.startRendering();
+    pct.textContent='90%';
+    const wav=toWAV(rendered);
+    const blob=new Blob([wav],{type:'audio/wav'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`200A_mix_${fmtDate()}.wav`; a.click();
+    URL.revokeObjectURL(url);
+    pct.textContent='100%'; toast('✓ Mix WAV exportado');
+  }catch(e){ console.error(e); toast('Error exportando: '+e.message); }
+  setTimeout(()=>ov.classList.remove('show'),600);
+}
+
+async function exportStems(){
+  if(!ch.some(c=>c.buf)){ toast('No hay stems'); return; }
+  toast('Exportando stems…');
+  for(let i=0;i<NUM;i++){
+    const c=ch[i]; if(!c.buf) continue;
+    const sr=AC.sampleRate, frames=Math.ceil(c.buf.duration*sr);
+    const off=new OfflineAudioContext({numberOfChannels:2,length:frames,sampleRate:sr});
+    const src=off.createBufferSource(); src.buffer=c.buf;
+    const g=off.createGain(); g.gain.value=c.vol;
+    const pan=off.createStereoPanner(); pan.pan.value=c.pan;
+    src.connect(g); g.connect(pan); pan.connect(off.destination); src.start(0);
+    const rendered=await off.startRendering();
+    const wav=toWAV(rendered);
+    const blob=new Blob([wav],{type:'audio/wav'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=`200A_ch${i+1}_${fmtDate()}.wav`; a.click();
+    URL.revokeObjectURL(url);
+    await new Promise(r=>setTimeout(r,350));
+  }
+  toast('✓ Stems exportados');
+}
+
+function toWAV(buf){
+  const nC=buf.numberOfChannels,sr=buf.sampleRate,len=buf.length;
+  const bPS=16,bpS=2,bA=nC*bpS,bR=sr*bA,dL=len*nC*bpS;
+  const ab=new ArrayBuffer(44+dL),v=new DataView(ab);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF');v.setUint32(4,36+dL,true);ws(8,'WAVE');ws(12,'fmt ');
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,nC,true);
+  v.setUint32(24,sr,true);v.setUint32(28,bR,true);v.setUint16(32,bA,true);v.setUint16(34,bPS,true);
+  ws(36,'data');v.setUint32(40,dL,true);
+  let off=44; const cd=[];
+  for(let c=0;c<nC;c++) cd.push(buf.getChannelData(c));
+  for(let i=0;i<len;i++) for(let c=0;c<nC;c++){const s=Math.max(-1,Math.min(1,cd[c][i]));v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);off+=2;}
+  return ab;
+}
+function fmtDate(){ return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+
+// ───────────────────────────────────────────────────────────
+//  INDEXEDDB (with markers saved)
+// ───────────────────────────────────────────────────────────
+function openIDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('vintage200a_v3',1);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('tracks')) db.createObjectStore('tracks',{keyPath:'id'});
+      if(!db.objectStoreNames.contains('meta'))   db.createObjectStore('meta',{keyPath:'key'});
+    };
+    req.onsuccess=e=>{idb=e.target.result;res();}; req.onerror=e=>rej(e);
+  });
+}
+
+async function saveSession(){
+  if(!idb) return;
+  try{
+    const tx=idb.transaction(['tracks','meta'],'readwrite');
+    const store=tx.objectStore('tracks'); const meta=tx.objectStore('meta');
+    for(let i=0;i<NUM;i++){
+      const c=ch[i];
+      if(c.buf){ const nC=c.buf.numberOfChannels,chs=[]; for(let j=0;j<nC;j++) chs.push(Array.from(c.buf.getChannelData(j))); store.put({id:i,channels:chs,sr:c.buf.sampleRate,len:c.buf.length,vol:c.vol,pan:c.pan,muted:c.muted,soloed:c.soloed}); }
+      else store.delete(i);
+    }
+    meta.put({key:'session',name:'200A v3',date:new Date().toISOString(),bpm:document.getElementById('bpmIn')?.value||120,markers,globalLatencyMs,manualLatencyMs});
+    await new Promise(r=>tx.oncomplete=r);
+    document.getElementById('sessName').textContent='SAVED';
+    toast('✓ Sesión guardada');
+  }catch(e){ toast('Error guardando: '+e.message); }
+}
+async function autoSave(){ await saveSession(); }
+
+async function loadSession(){
+  if(!idb){ toast('IDB no disponible'); return; }
+  try{
+    const tx=idb.transaction(['tracks','meta'],'readonly');
+    const metaReq=tx.objectStore('meta').get('session');
+    const m=await new Promise(r=>metaReq.onsuccess=e=>r(e.target.result));
+    if(!m){ toast('No hay sesión guardada'); return; }
+
+    // Restore meta
+    if(m.bpm) document.getElementById('bpmIn').value=m.bpm;
+    if(m.markers) markers=m.markers;
+    if(m.globalLatencyMs!=null){ globalLatencyMs=m.globalLatencyMs; }
+    if(m.manualLatencyMs!=null){ manualLatencyMs=m.manualLatencyMs; document.getElementById('latSlider').value=manualLatencyMs; document.getElementById('latSlVal').textContent=manualLatencyMs+' ms'; }
+    updateLatBadge(); updateMarkerList();
+
+    for(let i=0;i<NUM;i++){
+      const req=tx.objectStore('tracks').get(i);
+      const rec=await new Promise(r=>req.onsuccess=e=>r(e.target.result));
+      if(!rec) continue;
+      const buf=AC.createBuffer(rec.channels.length,rec.len,rec.sr);
+      rec.channels.forEach((d,j)=>buf.copyToChannel(new Float32Array(d),j));
+      ch[i].buf=buf; ch[i].vol=rec.vol??1; ch[i].pan=rec.pan??0;
+      ch[i].muted=rec.muted??false; ch[i].soloed=rec.soloed??false;
+      if(ch[i].gainNode) ch[i].gainNode.gain.value=ch[i].vol;
+      if(ch[i].panNode)  ch[i].panNode.pan.value=ch[i].pan;
+      setTimeout(()=>{
+        drawWave(i,buf); setWL(i,'AUDIO READY',COLORS[i]);
+        document.getElementById(`wdur${i}`).textContent=buf.duration.toFixed(1)+'s';
+        document.getElementById(`strip${i}`).classList.add('has-audio');
+        document.getElementById(`led${i}`).className='led amb';
+        document.getElementById(`vol${i}`).value=ch[i].vol;
+        setVol(i,ch[i].vol); applyPan(i);
+        if(ch[i].muted) document.getElementById(`mute${i}`).className='btn-mute on';
+        if(ch[i].soloed) document.getElementById(`solo${i}`).className='btn-solo on';
+      },80);
+    }
+    setTimeout(drawAllCursors,200);
+    document.getElementById('sessName').textContent='LOADED';
+    toast('✓ Sesión cargada con '+markers.length+' marcador(es)');
+  }catch(e){ toast('Error cargando: '+e.message); }
+}
+
+async function tryAutoLoad(){
+  if(!idb) return;
+  try{
+    const tx=idb.transaction('meta','readonly');
+    const req=tx.objectStore('meta').get('session');
+    const m=await new Promise(r=>req.onsuccess=e=>r(e.target.result));
+    if(m) await loadSession();
+  }catch(e){}
+}
+
+// ───────────────────────────────────────────────────────────
+//  KEYBOARD SHORTCUTS
+// ───────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(!AC) return;
+  if(e.code==='Space'){e.preventDefault();isPlaying?stopAll():playAll();}
+  if(e.code==='KeyM') toggleMetro();
+  if(e.code==='KeyT') tapTempo();
+  if(e.code==='Home'){ seekPos=0; updateSeekDisp(); drawAllCursors(); toast('SEEK → inicio'); }
+  if(e.ctrlKey&&e.code==='KeyZ'){e.preventDefault();undoLast();}
+  if(e.ctrlKey&&e.code==='KeyS'){e.preventDefault();saveSession();}
+  if(e.ctrlKey&&e.code==='KeyE'){e.preventDefault();exportMix();}
+  if(e.ctrlKey&&e.code==='KeyM'){e.preventDefault();addMarkerAtCursor();}
+});
+
+// ───────────────────────────────────────────────────────────
+//  RESIZE / ORIENTATION
+// ───────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{ ch.forEach((c,i)=>{ if(c.buf) drawWave(i,c.buf); }); setTimeout(drawAllCursors,50); });
+function checkOrient(){ const h=document.getElementById('land'); if(h) h.style.display=(window.innerWidth<window.innerHeight&&window.innerWidth<768)?'flex':'none'; }
+window.addEventListener('resize',checkOrient);
+window.addEventListener('orientationchange',()=>setTimeout(checkOrient,300));
+checkOrient();
+</script>
+</body>
+</html>
